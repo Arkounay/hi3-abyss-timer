@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Honkai Impact 3rd Abyss Timer Countdown</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <style>
+        main {
+            max-width: 400px;
+            padding: 10px;
+        }
+        #countdown-sentence {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<main class="container">
+    <h1 class="text-center">Abyss Timer Countdown (Global)</h1>
+
+    <br>
+
+    <label for="potions">Captain, how many Stealth Potions do you currently have ?</label>
+    <input value="0" min="0" max="30" type="number" id="potions">
+
+    <div id="countdown-sentence" style="display: none;">
+        The optimal time to use potions is in :
+        <div>
+            <strong id="timer"></strong>!
+        </div>
+    </div>
+
+</main>
+
+</body>
+
+<script src="plugins/countdown.js"></script>
+
+<script>
+    const $potions = document.getElementById('potions');
+    const $timer = document.getElementById('timer');
+    const $countdownSentence = document.getElementById('countdown-sentence');
+
+    const now = new Date();
+    const today = now.getDay();
+    const abyssEnd = new Date();
+    let cd;
+
+    let targetDay = 0;
+    if (today > 0) {
+        if (today <= 4) {
+            // thursday or after sunday : target date is thursday, otherwise it's sunday
+            targetDay = 4;
+        } else {
+            targetDay = 7;
+        }
+    }
+    abyssEnd.setDate(abyssEnd.getDate() + (targetDay - today));
+    abyssEnd.setUTCHours(21);
+    abyssEnd.setUTCMinutes(0);
+    abyssEnd.setUTCSeconds(0);
+
+    // after 21h
+    if (abyssEnd < now) {
+        targetDay = targetDay === 4 ? 7 : 4;
+        abyssEnd.setDate(abyssEnd.getDate() + (targetDay - today));
+    }
+
+    function timerRefresh(potionsNb) {
+        if (potionsNb > 0) {
+            $countdownSentence.style.display = 'block';
+            // substract 30 minutes per potions
+            const timer = new Date(abyssEnd - 60000 * 30 * potionsNb);
+            if (timer < now) {
+                $timer.innerText = 'NOW!'
+            } else {
+                cd = countdown(timer, (ts) => ($timer.innerHTML = ts.toHTML("strong")));
+            }
+        } else {
+            $countdownSentence.style.display = 'none';
+        }
+    }
+    timerRefresh(0);
+
+    ['keyup', 'click'].forEach((e) => {
+        $potions.addEventListener(e, function() {
+            if (e === 'click') {
+                this.select();
+            }
+            window.clearInterval(cd);
+            timerRefresh(this.value);
+        });
+    })
+</script>
+</html>
