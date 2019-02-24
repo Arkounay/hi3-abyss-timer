@@ -22,13 +22,13 @@
 
     <br>
 
-    <label for="potions">Captain, how many Stealth Potions do you currently have ?</label>
+    <label for="potions">Captain, how many Stealth Potions do you currently have?</label>
     <input value="0" min="0" max="30" type="number" id="potions">
 
     <div id="countdown-sentence" style="display: none;">
-        The optimal time to use potions is in :
+        The optimal time to use potions is in:
         <div>
-            <strong id="timer"></strong>!
+            <strong id="timer"></strong>! <div id="time"></div>
         </div>
     </div>
 
@@ -42,6 +42,7 @@
     const $potions = document.getElementById('potions');
     const $timer = document.getElementById('timer');
     const $countdownSentence = document.getElementById('countdown-sentence');
+    const $time = document.getElementById('time');
 
     const now = new Date();
     const today = now.getDay();
@@ -58,8 +59,8 @@
         }
     }
     abyssEnd.setDate(abyssEnd.getDate() + (targetDay - today));
-    abyssEnd.setUTCHours(19);
-    abyssEnd.setUTCMinutes(33);
+    abyssEnd.setUTCHours(20);
+    abyssEnd.setUTCMinutes(3);
     abyssEnd.setUTCSeconds(0);
 
     // after 21h
@@ -75,7 +76,9 @@
             const timer = new Date(abyssEnd - 60000 * 30 * potionsNb);
             if (timer < now) {
                 $timer.innerText = 'NOW!'
+                $time.innerText = '';
             } else {
+                $time.innerText = '(' + timer.toLocaleTimeString() + ')';
                 cd = countdown(timer, (ts) => ($timer.innerHTML = ts.toHTML("strong")));
             }
         } else {
